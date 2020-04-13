@@ -1,8 +1,10 @@
-package com.example.catalogshopping;
+package com.example.catalogshopping.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.example.catalogshopping.R;
 
 public class LoginActivity extends AppCompatActivity {
 

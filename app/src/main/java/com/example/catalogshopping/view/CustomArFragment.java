@@ -1,4 +1,4 @@
-package com.example.catalogshopping;
+package com.example.catalogshopping.view;
 
 import com.google.ar.sceneform.ux.ArFragment;
 

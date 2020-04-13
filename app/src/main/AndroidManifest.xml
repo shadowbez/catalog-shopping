@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.catalogshopping">
+
     <!-- APP PERMISSIONS -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- APP FEATURES -->
@@ -17,14 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".view.RegisterActivity"></activity>
-        <activity android:name=".view.LoginActivity" /> <!-- AR CORE META DATA -->
-        <meta-data
-            android:name="com.google.ar.core"
-            android:value="required" /> <!-- TODO is this correct? ML KIT FIREBASE BARCODE META DATA -->
-        <meta-data
-            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
-            android:value="barcode" /> <!-- TODO add file provider? -->
+
+        <activity android:name=".view.RegisterActivity" />
+        <activity android:name=".view.LoginActivity" />
         <activity android:name=".view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,6 +28,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- AR CORE META DATA -->
+        <meta-data
+            android:name="com.google.ar.core"
+            android:value="required" /> <!-- TODO is this correct? ML KIT FIREBASE BARCODE META DATA -->
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+            android:value="barcode" />
+
+        <!-- TODO add file provider? -->
+
     </application>
 
 </manifest>

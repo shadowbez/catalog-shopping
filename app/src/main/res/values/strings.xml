@@ -1,3 +1,12 @@
 <resources>
+
+    <!-- GENERAL APP STRINGS -->
     <string name="app_name">Catalog Shopping AR PRE-ALPHA</string>
+
+    <!-- LOGIN ACTIVITY -->
+
+    <!-- REGISTER ACTIVITY -->
+
+    <!-- MAIN ACTIVITY -->
+
 </resources>

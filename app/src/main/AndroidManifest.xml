@@ -23,6 +23,11 @@
 <!--        AR CORE META DATA-->
         <meta-data android:name="com.google.ar.core" android:value="required" />
 
+<!--        TODO is this correct? ML KIT FIREBASE BARCODE META DATA-->
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+            android:value="barcode" />
+
         <!--    TODO add file provider? -->
 
 

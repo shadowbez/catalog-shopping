@@ -1,12 +1,12 @@
 package com.example.catalogshopping.other;
 
 public class FirebaseStorageConstants {
-    private static final String IMAGES = "/image/";
-    private static final String MODELS = "/model/";
+    public static final String IMAGES = "/image/";
+    public static final String MODELS = "/model/";
 
-    private static final String SFB = "sfb";
-    private static final String GLTF = "glTF";
+    public static final String SFB = "sfb";
+    public static final String GLTF = "glTF";
 
-    private static final String JPG = "jpg";
-    private static final String PNG = "png";
+    public static final String JPG = "jpg";
+    public static final String PNG = "png";
 }

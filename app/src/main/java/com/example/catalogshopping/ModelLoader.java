@@ -26,7 +26,7 @@ public class ModelLoader {
         this.owner = owner;
     }
 
-    public void loadModel(Anchor anchor, File file) {
+    public void loadModel(Anchor anchor, String filePath) {
         if (owner.get() == null) {
             Log.d(TAG, "Activity is null.  Cannot load model.");
             return;
@@ -41,7 +41,7 @@ public class ModelLoader {
 
 
         ModelRenderable.builder()
-                .setSource(owner.get(), Uri.parse(file.getPath()))
+                .setSource(owner.get(), Uri.parse(filePath))
                 .build()
                 .handle((renderable, throwable) -> {
                     MainActivity activity = owner.get();

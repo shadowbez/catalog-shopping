@@ -2,6 +2,8 @@ package com.example.catalogshopping.view;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -10,7 +12,10 @@ import android.widget.Button;
 
 import com.example.catalogshopping.CrosshairDrawable;
 import com.example.catalogshopping.ModelLoader;
+import com.example.catalogshopping.ProductsAdapter;
 import com.example.catalogshopping.R;
+import com.example.catalogshopping.model.ShoppingCart;
+import com.example.catalogshopping.other.FirebaseStorageConstants;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.ar.core.Frame;
@@ -29,6 +34,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
+
     private CustomArFragment fragment;
 
     private CrosshairDrawable crosshair = new CrosshairDrawable();
@@ -40,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private StorageReference storageReference;
 
     private Button dw;
+
+    private ShoppingCart shoppingCart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +66,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
         initUI();
+        initShoppingCart();
     }
 
     public CustomArFragment getCustomArFragment() {
         return fragment;
+    }
+
+    private void initShoppingCart() {
+        shoppingCart = new ShoppingCart();
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_main_cart);
+        ProductsAdapter productsAdapter = new ProductsAdapter(shoppingCart);
+
+        recyclerView.setAdapter(productsAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
     }
 
     private void initFirebaseElements() {
@@ -73,16 +93,42 @@ public class MainActivity extends AppCompatActivity {
         dw = (Button) findViewById(R.id.button);
         dw.setOnClickListener(e -> {
             try {
-                File file = File.createTempFile("def", "sfb");
-                storageReference.child("/model/def.sfb").getFile(file).addOnSuccessListener(taskSnapshot -> {
-                    Log.i("wololo", "SUCCC");
-                    addModelToScene(file);
-                }).addOnFailureListener(e1 -> Log.i("wololo", "NOOOOOOO"));
+                File modelFile = File.createTempFile("default", FirebaseStorageConstants.SFB);
+                File imageFile = File.createTempFile("default", FirebaseStorageConstants.PNG);
+
+                storageReference.child(FirebaseStorageConstants.IMAGES + "default" + "." + FirebaseStorageConstants.PNG)
+                        .getFile(imageFile).addOnSuccessListener(taskSnapshot -> {
+                    Log.i(TAG, "Firebase storage image loaded successfully");
+
+                }).addOnFailureListener(e1 -> Log.i(TAG, "Firebase storage image could not be loaded"));
+
+                storageReference.child(FirebaseStorageConstants.MODELS + "default" + "." + FirebaseStorageConstants.SFB)
+                        .getFile(modelFile).addOnSuccessListener(taskSnapshot -> {
+                    Log.i(TAG, "Firebase storage file loaded successfully");
+                    addModelToScene(modelFile);
+                }).addOnFailureListener(e1 -> Log.i(TAG, "Firebase storage file could not be loaded"));
 
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         });
+    }
+
+    private void addModelToScene(File file) {
+        Frame frame = fragment.getArSceneView().getArFrame();
+        android.graphics.Point pt = getScreenCenter();
+        List<HitResult> hits;
+        if (frame != null) {
+            hits = frame.hitTest(pt.x, pt.y);
+            for (HitResult hit : hits) {
+                Trackable trackable = hit.getTrackable();
+                if (trackable instanceof Plane &&
+                        ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
+                    modelLoader.loadModel(hit.createAnchor(), file.getPath());
+                    break;
+                }
+            }
+        }
     }
 
     private void updateCrosshairStatus() {
@@ -139,20 +185,4 @@ public class MainActivity extends AppCompatActivity {
         return new android.graphics.Point(view.getWidth() / 2, view.getHeight() / 2);
     }
 
-    private void addModelToScene(File file) {
-        Frame frame = fragment.getArSceneView().getArFrame();
-        android.graphics.Point pt = getScreenCenter();
-        List<HitResult> hits;
-        if (frame != null) {
-            hits = frame.hitTest(pt.x, pt.y);
-            for (HitResult hit : hits) {
-                Trackable trackable = hit.getTrackable();
-                if (trackable instanceof Plane &&
-                        ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
-                    modelLoader.loadModel(hit.createAnchor(), file);
-                    break;
-                }
-            }
-        }
-    }
 }

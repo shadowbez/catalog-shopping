@@ -11,7 +11,7 @@
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
+        android:text="CLEAR"
         app:layout_constraintBottom_toBottomOf="@+id/fragment__main_ar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.049"
@@ -23,7 +23,7 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="DW"
+        android:text="SCAN/DW"
         app:layout_constraintBottom_toBottomOf="@+id/fragment__main_ar"
         app:layout_constraintEnd_toEndOf="@+id/fragment__main_ar"
         app:layout_constraintHorizontal_bias="0.95"
@@ -55,27 +55,32 @@
         app:layout_constraintVertical_chainStyle="spread"
         app:layout_constraintVertical_weight="1" >
 
-        <HorizontalScrollView
-            android:id="@+id/scroll_main_items"
+<!--        <HorizontalScrollView-->
+<!--            android:id="@+id/scroll_main_items"-->
+<!--            android:layout_width="325dp"-->
+<!--            android:layout_height="match_parent">-->
+
+<!--            <LinearLayout-->
+<!--                android:id="@+id/linear_main_items"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="ITEM 1" />-->
+
+<!--            </LinearLayout>-->
+
+<!--        </HorizontalScrollView>-->
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_main_cart"
             android:layout_width="325dp"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-                android:id="@+id/linear_main_items"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="ITEM 1" />
-
-            </LinearLayout>
-
-        </HorizontalScrollView>
-
+            android:layout_height="match_parent" />
 
         <LinearLayout
             android:id="@+id/linear_main_other"

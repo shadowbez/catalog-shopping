@@ -8,7 +8,19 @@
     android:id="@+id/const_main">
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/button_main_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LOAD"
+        app:layout_constraintBottom_toBottomOf="@+id/fragment__main_ar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.852" />
+
+    <Button
+        android:id="@+id/button_main_clear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="CLEAR"
@@ -20,7 +32,7 @@
         app:layout_constraintVertical_bias="0.957" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/button_main_scan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="SCAN/DW"

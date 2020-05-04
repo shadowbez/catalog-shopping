@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 
 import com.example.catalogshopping.view.CustomArFragment;
 import com.example.catalogshopping.view.MainActivity;
@@ -13,7 +14,6 @@ import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.ux.TransformableNode;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 
 public class ModelLoader {
@@ -52,20 +52,22 @@ public class ModelLoader {
                         onException(throwable, activity);
                     } else {
 //                        activity.addNodeToScene(anchor, renderable);
-                        addNodeToScene(anchor, renderable, activity.getCustomArFragment());
+                        owner.get().getLoadedNodes().add(addNodeToScene(anchor, renderable, activity.getCustomArFragment()));
                     }
                     return null;
                 });
     }
 
 
-    private void addNodeToScene(Anchor anchor, ModelRenderable renderable, CustomArFragment fragment) {
+    private AnchorNode addNodeToScene(Anchor anchor, ModelRenderable renderable, CustomArFragment fragment) {
         AnchorNode anchorNode = new AnchorNode(anchor);
         TransformableNode node = new TransformableNode(fragment.getTransformationSystem());
         node.setRenderable(renderable);
         node.setParent(anchorNode);
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
+
+        return anchorNode;
     }
 
     private void onException(Throwable throwable, Context context){
@@ -76,5 +78,19 @@ public class ModelLoader {
         AlertDialog dialog = builder.create();
 
         dialog.show();
+    }
+
+    public void removeAnchorNode(AnchorNode anchorNode) {
+        MainActivity activity = owner.get();
+        if (activity != null && anchorNode != null) {
+            activity.getCustomArFragment().getArSceneView().getScene().removeChild(anchorNode);
+            anchorNode.getAnchor().detach();
+            anchorNode.setParent(null);
+            anchorNode = null;
+
+            Log.i(TAG, "AnchorNode removed");
+        } else {
+            Log.i(TAG, "AnchorNode was null");
+        }
     }
 }

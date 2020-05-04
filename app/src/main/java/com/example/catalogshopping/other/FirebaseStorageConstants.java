@@ -8,5 +8,5 @@ public class FirebaseStorageConstants {
     public static final String GLTF = "glTF";
 
     public static final String JPG = "jpg";
-    public static final String PNG = "png";
+    public static final String PNG = "PNG";
 }

@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     private File currentProductImage;
     private File currentProductModel;
 
-    private boolean[] loaded = new boolean[3];
+    private final boolean[] loaded = new boolean[3];
 
     private List<AnchorNode> loadedNodes;
 
@@ -240,10 +240,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void createAndSendPhoto() {
         //TODO WUUUUUD
-        loaded[0] = false;
-        loaded[1] = false;
-        loaded[2] = false;
-        load.setVisibility(Button.INVISIBLE);
+//        loaded[0] = false;
+//        loaded[1] = false;
+//        loaded[2] = false;
+//        load.setVisibility(Button.INVISIBLE);
+        synchronized (loaded) {
+            loaded[0] = false;
+            loaded[1] = false;
+            loaded[2] = false;
+            load.setVisibility(Button.INVISIBLE);
+        }
         // REMOVE ANCHORS
         // SET NULLS
 
@@ -307,23 +313,25 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, productFirestore.toString());
                 currentProductFirestore = productFirestore;
 
-                loaded[0] = true;
                 // TODO Do sync block on all???
-                if (checkAllLoaded()) {
-                    load.setVisibility(Button.VISIBLE);
-                } else {
-                    load.setVisibility(Button.INVISIBLE);
-                }
+//                loaded[0] = true;
+//                if (checkAllLoaded()) {
+//                    load.setVisibility(Button.VISIBLE);
+//                } else {
+//                    load.setVisibility(Button.INVISIBLE);
+//                }
+                updateAndCheckLoadVisibility(0);
             } else {
                 Log.i(TAG, "Product with id: " + id + " not found. Creating dummy.");
                 currentProductFirestore = Util.dummyProductFirestore(id);
 
-                loaded[0] = true;
-                if (checkAllLoaded()) {
-                    load.setVisibility(Button.VISIBLE);
-                } else {
-                    load.setVisibility(Button.INVISIBLE);
-                }
+//                loaded[0] = true;
+//                if (checkAllLoaded()) {
+//                    load.setVisibility(Button.VISIBLE);
+//                } else {
+//                    load.setVisibility(Button.INVISIBLE);
+//                }
+                updateAndCheckLoadVisibility(0);
             }
         })
         .addOnFailureListener(e -> {
@@ -342,12 +350,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "Firebase storage model loaded successfully");
                 currentProductModel = modelFile;
 
-                loaded[1] = true;
-                if (checkAllLoaded()) {
-                    load.setVisibility(Button.VISIBLE);
-                } else {
-                    load.setVisibility(Button.INVISIBLE);
-                }
+//                loaded[1] = true;
+//                if (checkAllLoaded()) {
+//                    load.setVisibility(Button.VISIBLE);
+//                } else {
+//                    load.setVisibility(Button.INVISIBLE);
+//                }
+                updateAndCheckLoadVisibility(1);
             }).addOnFailureListener(e1 -> {
                 Log.i(TAG, e1.toString());
                 Util.showToast(this, true, e1.toString());
@@ -367,12 +376,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "Firebase storage image loaded successfully");
                 currentProductImage = imageFile;
 
-                loaded[2] = true;
-                if (checkAllLoaded()) {
-                    load.setVisibility(Button.VISIBLE);
-                } else {
-                    load.setVisibility(Button.INVISIBLE);
-                }
+//                loaded[2] = true;
+//                if (checkAllLoaded()) {
+//                    load.setVisibility(Button.VISIBLE);
+//                } else {
+//                    load.setVisibility(Button.INVISIBLE);
+//                }
+                updateAndCheckLoadVisibility(2);
             }).addOnFailureListener(e1 -> {
                 Log.i(TAG, e1.toString());
                 Util.showToast(this, true, e1.toString());
@@ -398,5 +408,16 @@ public class MainActivity extends AppCompatActivity {
 
     public List<AnchorNode> getLoadedNodes() {
         return loadedNodes;
+    }
+
+    private void updateAndCheckLoadVisibility(int loadedPos) {
+        synchronized (loaded) {
+            loaded[loadedPos] = true;
+            if (checkAllLoaded()) {
+                load.setVisibility(Button.VISIBLE);
+            } else {
+                load.setVisibility(Button.INVISIBLE);
+            }
+        }
     }
 }

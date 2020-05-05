@@ -6,6 +6,7 @@ import java.util.List;
 public class ShoppingCart {
     private double overallPrice;
     private List<Product> products;
+//    private List<ProductFirestore> products;
 
     public ShoppingCart() {
         products = new ArrayList<>();
@@ -19,13 +20,13 @@ public class ShoppingCart {
     }
 
     public int addItem(Product product) {
-        int existPlace = exists(product.getId());
+        int existPlace = exists(product.getProductFirestore().getId());
         if (existPlace >= 0) {
-            products.get(existPlace).setQuantity(products.get(existPlace).getQuantity() + product.getQuantity());
+//            products.get(existPlace).setQuantity(products.get(existPlace).getQuantity() + product.getQuantity());
         } else {
             products.add(product);
         }
-        overallPrice += (product.getPrice() * product.getQuantity());
+//        overallPrice += (product.getPrice() * product.getQuantity());
 
         return existPlace;
     }
@@ -56,7 +57,7 @@ public class ShoppingCart {
         int place = -1;
 
         for (int i = 0; i < products.size(); i++) {
-            if (products.get(i).getId().equalsIgnoreCase(id)) {
+            if (products.get(i).getProductFirestore().getId().equalsIgnoreCase(id)) {
                 place = i;
                 break;
             }

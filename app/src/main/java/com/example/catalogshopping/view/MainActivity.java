@@ -92,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
 
     private List<AnchorNode> loadedNodes;
 
+    private ProductsAdapter productsAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,11 +118,19 @@ public class MainActivity extends AppCompatActivity {
         return fragment;
     }
 
+    public ShoppingCart getShoppingCart() {
+        return shoppingCart;
+    }
+
+    public ProductsAdapter getProductsAdapter() {
+        return productsAdapter;
+    }
+
     private void initShoppingCart() {
         shoppingCart = new ShoppingCart();
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_main_cart);
-        ProductsAdapter productsAdapter = new ProductsAdapter(shoppingCart);
+        productsAdapter = new ProductsAdapter(shoppingCart);
 
         recyclerView.setAdapter(productsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -175,7 +185,8 @@ public class MainActivity extends AppCompatActivity {
                 Trackable trackable = hit.getTrackable();
                 if (trackable instanceof Plane &&
                         ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
-                    modelLoader.loadModel(hit.createAnchor(), file.getPath());
+                    Product product = new Product(currentProductFirestore, currentProductImage, currentProductModel);
+                    modelLoader.loadModel(hit.createAnchor(), file.getPath(), product);
                     break;
                 }
             }
@@ -293,7 +304,6 @@ public class MainActivity extends AppCompatActivity {
                         // GET MODEL STORAGE
                         getProductImageFirebaseStorage(rawValue);
                         getProductModelFirebaseStorage(rawValue);
-
                         break;
                     }
                 })

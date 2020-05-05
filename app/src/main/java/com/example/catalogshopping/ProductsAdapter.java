@@ -1,5 +1,7 @@
 package com.example.catalogshopping;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.catalogshopping.model.Product;
+import com.example.catalogshopping.model.ProductFirestore;
 import com.example.catalogshopping.model.ShoppingCart;
 
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHolder> {
@@ -35,10 +38,18 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         Product product = shoppingCart.getProducts().get(position);
 
         holder.closeButton.setOnClickListener(e -> {
+            shoppingCart.getProducts().remove(position);
+
+            //TODO FIX
+            this.notifyItemRemoved(position);
+        });
+        Bitmap myBitmap = BitmapFactory.decodeFile(product.getImage().getAbsolutePath());
+        holder.productImageView.setImageBitmap(myBitmap);
+        holder.productImageView.setOnClickListener(e -> {
 
         });
-//        holder.productImageView = product.image
-        holder.quantityTextView.setText("x " + product.getQuantity());
+//        holder.quantityTextView.setText("x " + product.getQuantity());
+        holder.quantityTextView.setText("x 1");
     }
 
     @Override

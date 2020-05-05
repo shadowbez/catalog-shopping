@@ -1,41 +1,36 @@
 package com.example.catalogshopping.model;
 
+import java.io.File;
+
 public class Product {
-    private String id;
-    private String name;
-    private double price;
-    private String desc;
-    private int quantity;
 
-    public Product(String id, String name, double price, String desc, int quantity) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-        this.desc = desc;
-        this.quantity = quantity;
+    private ProductFirestore productFirestore;
+    private File image;
+    private File model;
+
+    public Product(ProductFirestore productFirestore, File image, File model) {
+        this.productFirestore = productFirestore;
+        this.image = image;
+        this.model = model;
     }
 
-    public String getId() {
-        return id;
+    public ProductFirestore getProductFirestore() {
+        return productFirestore;
     }
 
-    public String getName() {
-        return name;
+    public File getImage() {
+        return image;
     }
 
-    public double getPrice() {
-        return price;
+    public void setImage(File image) {
+        this.image = image;
     }
 
-    public String getDesc() {
-        return desc;
+    public File getModel() {
+        return model;
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setModel(File model) {
+        this.model = model;
     }
 }

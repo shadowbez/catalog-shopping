@@ -49,7 +49,6 @@ import com.google.firebase.storage.StorageReference;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -57,16 +56,18 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    private CustomArFragment fragment;
-
     private CrosshairDrawable crosshair = new CrosshairDrawable();
     private boolean isTracking;
     private boolean isHitting;
 
-    private ModelLoader modelLoader;
+    private CustomArFragment fragment;
+    private Button scanButton;
+    private Button loadButton;
+    private Button clearButton;
 
+    private FirebaseFirestore db;
+    private CollectionReference products;
     private StorageReference storageReference;
-
     private FirebaseVisionBarcodeDetector detector;
     private FirebaseVisionBarcodeDetectorOptions options =
             new FirebaseVisionBarcodeDetectorOptions.Builder()
@@ -74,24 +75,14 @@ public class MainActivity extends AppCompatActivity {
                             FirebaseVisionBarcode.FORMAT_EAN_13)
                     .build();
 
-    private FirebaseFirestore db;
-    private CollectionReference products;
-
-
-    private Button scan;
-    private Button load;
-    private Button clear;
-
-    private ShoppingCart shoppingCart;
-    private Product currentProduct;
     private ProductFirestore currentProductFirestore;
     private File currentProductImage;
     private File currentProductModel;
-
     private final boolean[] loaded = new boolean[3];
-
     private List<AnchorNode> loadedNodes;
 
+    private ModelLoader modelLoader;
+    private ShoppingCart shoppingCart;
     private ProductsAdapter productsAdapter;
 
     @Override
@@ -103,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
         loadedNodes = new CopyOnWriteArrayList<>(); //TODO explain this shit
         modelLoader = new ModelLoader(new WeakReference<>(this));
+
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.fragment__main_ar);
 
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
@@ -126,11 +118,15 @@ public class MainActivity extends AppCompatActivity {
         return productsAdapter;
     }
 
+    public List<AnchorNode> getLoadedNodes() {
+        return loadedNodes;
+    }
+
     private void initShoppingCart() {
         shoppingCart = new ShoppingCart();
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_main_cart);
-        productsAdapter = new ProductsAdapter(shoppingCart);
+        productsAdapter = new ProductsAdapter(shoppingCart, new WeakReference<>(this));
 
         recyclerView.setAdapter(productsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -151,31 +147,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initUI() {
-        scan = (Button) findViewById(R.id.button_main_scan);
-        load = (Button) findViewById(R.id.button_main_load);
-        clear = (Button) findViewById(R.id.button_main_clear);
+        scanButton = (Button) findViewById(R.id.button_main_scan);
+        loadButton = (Button) findViewById(R.id.button_main_load);
+        clearButton = (Button) findViewById(R.id.button_main_clear);
 
-        clear.setOnClickListener(e -> {
+        clearButton.setOnClickListener(e -> {
             for (AnchorNode elem : loadedNodes) {
                 modelLoader.removeAnchorNode(elem);
                 loadedNodes.remove(elem);
             }
         });
 
-        scan.setOnClickListener(e -> {
+        scanButton.setOnClickListener(e -> {
             createAndSendPhoto();
         });
 
         if (!checkAllLoaded()) {
-            load.setVisibility(Button.INVISIBLE);
+            loadButton.setVisibility(Button.INVISIBLE);
         }
-        load.setOnClickListener(e -> {
+        loadButton.setOnClickListener(e -> {
             addModelToScene(currentProductModel);
         });
-
     }
 
-    private void addModelToScene(File file) {
+    public void addModelToScene(File file) {
         Frame frame = fragment.getArSceneView().getArFrame();
         android.graphics.Point pt = getScreenCenter();
         List<HitResult> hits;
@@ -250,16 +245,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void createAndSendPhoto() {
-        //TODO WUUUUUD
-//        loaded[0] = false;
-//        loaded[1] = false;
-//        loaded[2] = false;
-//        load.setVisibility(Button.INVISIBLE);
         synchronized (loaded) {
             loaded[0] = false;
             loaded[1] = false;
             loaded[2] = false;
-            load.setVisibility(Button.INVISIBLE);
+            loadButton.setVisibility(Button.INVISIBLE);
         }
         // REMOVE ANCHORS
         // SET NULLS
@@ -296,9 +286,7 @@ public class MainActivity extends AppCompatActivity {
 
                         String rawValue = barcode.getRawValue();
 
-                        Snackbar.make(findViewById(android.R.id.content),
-                                rawValue, Snackbar.LENGTH_LONG).show();
-
+                        Util.showSnackbar(findViewById(android.R.id.content), false, rawValue);
                         // GET INFO FIRESTORE
                         getProductFirestore(rawValue);
                         // GET MODEL STORAGE
@@ -323,24 +311,11 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, productFirestore.toString());
                 currentProductFirestore = productFirestore;
 
-                // TODO Do sync block on all???
-//                loaded[0] = true;
-//                if (checkAllLoaded()) {
-//                    load.setVisibility(Button.VISIBLE);
-//                } else {
-//                    load.setVisibility(Button.INVISIBLE);
-//                }
                 updateAndCheckLoadVisibility(0);
             } else {
                 Log.i(TAG, "Product with id: " + id + " not found. Creating dummy.");
                 currentProductFirestore = Util.dummyProductFirestore(id);
 
-//                loaded[0] = true;
-//                if (checkAllLoaded()) {
-//                    load.setVisibility(Button.VISIBLE);
-//                } else {
-//                    load.setVisibility(Button.INVISIBLE);
-//                }
                 updateAndCheckLoadVisibility(0);
             }
         })
@@ -360,12 +335,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "Firebase storage model loaded successfully");
                 currentProductModel = modelFile;
 
-//                loaded[1] = true;
-//                if (checkAllLoaded()) {
-//                    load.setVisibility(Button.VISIBLE);
-//                } else {
-//                    load.setVisibility(Button.INVISIBLE);
-//                }
                 updateAndCheckLoadVisibility(1);
             }).addOnFailureListener(e1 -> {
                 Log.i(TAG, e1.toString());
@@ -386,12 +355,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "Firebase storage image loaded successfully");
                 currentProductImage = imageFile;
 
-//                loaded[2] = true;
-//                if (checkAllLoaded()) {
-//                    load.setVisibility(Button.VISIBLE);
-//                } else {
-//                    load.setVisibility(Button.INVISIBLE);
-//                }
                 updateAndCheckLoadVisibility(2);
             }).addOnFailureListener(e1 -> {
                 Log.i(TAG, e1.toString());
@@ -416,17 +379,13 @@ public class MainActivity extends AppCompatActivity {
         return load;
     }
 
-    public List<AnchorNode> getLoadedNodes() {
-        return loadedNodes;
-    }
-
     private void updateAndCheckLoadVisibility(int loadedPos) {
         synchronized (loaded) {
             loaded[loadedPos] = true;
             if (checkAllLoaded()) {
-                load.setVisibility(Button.VISIBLE);
+                loadButton.setVisibility(Button.VISIBLE);
             } else {
-                load.setVisibility(Button.INVISIBLE);
+                loadButton.setVisibility(Button.INVISIBLE);
             }
         }
     }

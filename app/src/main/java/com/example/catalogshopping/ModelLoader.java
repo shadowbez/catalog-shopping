@@ -47,7 +47,6 @@ public class ModelLoader {
 //                .setRecenterMode(RenderableSource.RecenterMode.ROOT)
 //                .build();
 
-
         ModelRenderable.builder()
                 .setSource(owner.get(), Uri.parse(modelFilePath))
                 .build()
@@ -56,27 +55,13 @@ public class ModelLoader {
                     if (activity == null) {
                         return null;
                     } else if (throwable != null) {
-//                        activity.onException(throwable);
                         onException(throwable, activity);
                     } else {
-//                        activity.addNodeToScene(anchor, renderable);
                         owner.get().getLoadedNodes().add(addNodeToScene(anchor, renderable, activity.getCustomArFragment(), activity, product));
                     }
                     return null;
                 });
     }
-
-
-//    private AnchorNode addNodeToScene(Anchor anchor, ModelRenderable renderable, CustomArFragment fragment) {
-//        AnchorNode anchorNode = new AnchorNode(anchor);
-//        TransformableNode node = new TransformableNode(fragment.getTransformationSystem());
-//        node.setRenderable(renderable);
-//        node.setParent(anchorNode);
-//        fragment.getArSceneView().getScene().addChild(anchorNode);
-//        node.select();
-//
-//        return anchorNode;
-//    }
 
     private AnchorNode addNodeToScene(Anchor anchor, ModelRenderable renderable, CustomArFragment fragment, MainActivity mainActivity, Product product) {
         AnchorNode anchorNode = new AnchorNode(anchor);
@@ -122,8 +107,10 @@ public class ModelLoader {
 
                     // TODO FIX
                     addToCart.setOnClickListener(e -> {
-                        mainActivity.getShoppingCart().addItem(product);
-                        mainActivity.getProductsAdapter().notifyItemInserted(mainActivity.getShoppingCart().getProducts().size() - 1);
+                        int existed = mainActivity.getShoppingCart().addItem(product);
+                        if (existed < 0) {
+                            mainActivity.getProductsAdapter().notifyItemInserted(mainActivity.getShoppingCart().getProducts().size() - 1);
+                        }
                     });
 
                 });

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShoppingCart {
-    private double overallPrice;
+
     private List<Product> products;
-//    private List<ProductFirestore> products;
+    private double overallPrice;
 
     public ShoppingCart() {
         products = new ArrayList<>();
@@ -21,12 +21,9 @@ public class ShoppingCart {
 
     public int addItem(Product product) {
         int existPlace = exists(product.getProductFirestore().getId());
-        if (existPlace >= 0) {
-//            products.get(existPlace).setQuantity(products.get(existPlace).getQuantity() + product.getQuantity());
-        } else {
+        if (existPlace < 0) {
             products.add(product);
         }
-//        overallPrice += (product.getPrice() * product.getQuantity());
 
         return existPlace;
     }

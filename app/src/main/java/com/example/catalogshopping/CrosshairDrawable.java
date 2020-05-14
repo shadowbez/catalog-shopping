@@ -10,23 +10,28 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+/**
+ * Class to create a crosshair for the user indicating on whether a model could be placed or not.
+ * IS NOT WORKING REPORTEDLY DUE TO UNKNOWN SCENEFORM GLITCH
+ */
 public class CrosshairDrawable extends Drawable {
 
     private static final String TAG = "CrosshairDrawable";
 
-    private final Paint paint = new Paint();
+    private Paint paint = new Paint();
     private boolean enabled;
 
     @Override
     public void draw(@NonNull Canvas canvas) {
-        float cx = canvas.getWidth() / 2;
-        float cy = canvas.getHeight() / 2;
+        float x = canvas.getWidth() / 2;
+        float y = canvas.getHeight() / 2;
         if (enabled) {
             paint.setColor(Color.GREEN);
-            canvas.drawCircle(cx, cy, 15, paint);
+            canvas.drawCircle(x, y, 15, paint);
         } else {
             paint.setColor(Color.RED);
-            canvas.drawText("X", cx, cy, paint);
+            canvas.drawCircle(x, y, 15, paint);
+//            canvas.drawText("X", x, y, paint);
         }
     }
 

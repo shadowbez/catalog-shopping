@@ -20,9 +20,9 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
-        <activity android:name=".view.RegisterActivity" />
-        <activity android:name=".view.LoginActivity" />
-        <activity android:name=".view.MainActivity">
+
+        <activity android:name=".view.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,12 +33,10 @@
         <!-- AR CORE META DATA -->
         <meta-data
             android:name="com.google.ar.core"
-            android:value="required" /> <!-- TODO is this correct? ML KIT FIREBASE BARCODE META DATA -->
+            android:value="required" />
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="barcode" />
-
-        <!-- TODO add file provider? -->
 
     </application>
 

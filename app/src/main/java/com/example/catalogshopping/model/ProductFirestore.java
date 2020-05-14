@@ -1,5 +1,8 @@
 package com.example.catalogshopping.model;
 
+/**
+ * POJO FOR RETRIEVING ITEMS FROM FIRESTORE DATABASE
+ */
 public class ProductFirestore {
 
     private String id;

@@ -19,9 +19,19 @@ import com.example.catalogshopping.view.MainActivity;
 
 import java.lang.ref.WeakReference;
 
+/**
+ * Adapter class for RecyclerView of shopping functionality of the application.
+ */
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHolder> {
 
+    /**
+     * WeakReference of MainActivity in order to safely gather activity reference and use properties.
+     */
     private WeakReference<MainActivity> activity;
+
+    /**
+     * ShoppingCart object which stores all data of a product.
+     */
     private ShoppingCart shoppingCart;
 
     public ProductsAdapter(ShoppingCart shoppingCart, WeakReference<MainActivity> activity) {
@@ -42,6 +52,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Product product = shoppingCart.getProducts().get(position);
 
+        // LOAD IMAGE FROM FILE AND SETUP CLICK LISTENER
         Bitmap myBitmap = BitmapFactory.decodeFile(product.getImage().getAbsolutePath());
         holder.productImageView.setImageBitmap(myBitmap);
         holder.productImageView.setOnClickListener(e -> {
@@ -50,6 +61,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
             }
         });
 
+        // Remove product form shopping cart and notify UI to update
         holder.closeButton.setOnClickListener(e -> {
             shoppingCart.getProducts().remove(position);
             notifyDataSetChanged();
@@ -65,15 +77,16 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         return shoppingCart;
     }
 
+    /**
+     * Inner class which holds the views for a single item in the RecyclerView.
+     */
     class ViewHolder extends RecyclerView.ViewHolder {
-        TextView quantityTextView;
         Button closeButton;
         ImageView productImageView;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            quantityTextView = (TextView) itemView.findViewById(R.id.text_cart_number);
             closeButton = (Button) itemView.findViewById(R.id.button_cart_close);
             productImageView = (ImageView) itemView.findViewById(R.id.image_cart_main);
         }

@@ -6,6 +6,9 @@ import com.google.ar.core.Config;
 import com.google.ar.core.Session;
 import com.google.ar.sceneform.ux.ArFragment;
 
+/**
+ * Customized ArFragment. All ArFragment configurations need to be declared here.
+ */
 public class CustomArFragment extends ArFragment {
 
     @Override
@@ -13,7 +16,9 @@ public class CustomArFragment extends ArFragment {
         String[] additionalPermissions = super.getAdditionalPermissions();
         int permissionLength = additionalPermissions != null ? additionalPermissions.length : 0;
         String[] permissions = new String[permissionLength + 1];
+        // ADD ADDITIONAL PERMISSIONS
         permissions[0] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
         if (permissionLength > 0) {
             System.arraycopy(additionalPermissions, 0, permissions, 1, additionalPermissions.length);
         }
@@ -23,9 +28,8 @@ public class CustomArFragment extends ArFragment {
     @Override
     protected Config getSessionConfiguration(Session session) {
         Config config = super.getSessionConfiguration(session);
-        config.setFocusMode(Config.FocusMode.AUTO);
+        config.setFocusMode(Config.FocusMode.AUTO); //AUTOFOCUS
 //        config.setPlaneFindingMode(Config.PlaneFindingMode.DISABLED);
-
         return config;
     }
 }

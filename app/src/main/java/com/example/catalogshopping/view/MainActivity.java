@@ -75,10 +75,11 @@ public class MainActivity extends AppCompatActivity {
                             FirebaseVisionBarcode.FORMAT_EAN_13)
                     .build();
 
+    private boolean[] loaded = new boolean[3];
     private ProductFirestore currentProductFirestore;
     private File currentProductImage;
     private File currentProductModel;
-    private final boolean[] loaded = new boolean[3];
+
     private List<AnchorNode> loadedNodes;
 
     private ModelLoader modelLoader;
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
         initFirebaseElements();
 
-        loadedNodes = new CopyOnWriteArrayList<>(); //TODO explain this shit
+        loadedNodes = new CopyOnWriteArrayList<>();
         modelLoader = new ModelLoader(new WeakReference<>(this));
 
         fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.fragment__main_ar);
@@ -120,6 +121,24 @@ public class MainActivity extends AppCompatActivity {
 
     public List<AnchorNode> getLoadedNodes() {
         return loadedNodes;
+    }
+
+    public void addModelToScene(File file) {
+        Frame frame = fragment.getArSceneView().getArFrame();
+        android.graphics.Point pt = getScreenCenter();
+        List<HitResult> hits;
+        if (frame != null) {
+            hits = frame.hitTest(pt.x, pt.y);
+            for (HitResult hit : hits) {
+                Trackable trackable = hit.getTrackable();
+                if (trackable instanceof Plane &&
+                        ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
+                    Product product = new Product(currentProductFirestore, currentProductImage, currentProductModel);
+                    modelLoader.loadModelAndInformation(hit.createAnchor(), file.getPath(), product);
+                    break;
+                }
+            }
+        }
     }
 
     private void initShoppingCart() {
@@ -168,24 +187,6 @@ public class MainActivity extends AppCompatActivity {
         loadButton.setOnClickListener(e -> {
             addModelToScene(currentProductModel);
         });
-    }
-
-    public void addModelToScene(File file) {
-        Frame frame = fragment.getArSceneView().getArFrame();
-        android.graphics.Point pt = getScreenCenter();
-        List<HitResult> hits;
-        if (frame != null) {
-            hits = frame.hitTest(pt.x, pt.y);
-            for (HitResult hit : hits) {
-                Trackable trackable = hit.getTrackable();
-                if (trackable instanceof Plane &&
-                        ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
-                    Product product = new Product(currentProductFirestore, currentProductImage, currentProductModel);
-                    modelLoader.loadModel(hit.createAnchor(), file.getPath(), product);
-                    break;
-                }
-            }
-        }
     }
 
     private void updateCrosshairStatus() {
@@ -242,8 +243,6 @@ public class MainActivity extends AppCompatActivity {
         return new android.graphics.Point(view.getWidth() / 2, view.getHeight() / 2);
     }
 
-
-
     private void createAndSendPhoto() {
         synchronized (loaded) {
             loaded[0] = false;
@@ -251,8 +250,6 @@ public class MainActivity extends AppCompatActivity {
             loaded[2] = false;
             loadButton.setVisibility(Button.INVISIBLE);
         }
-        // REMOVE ANCHORS
-        // SET NULLS
 
         ArSceneView view = fragment.getArSceneView();
 
@@ -338,7 +335,18 @@ public class MainActivity extends AppCompatActivity {
                 updateAndCheckLoadVisibility(1);
             }).addOnFailureListener(e1 -> {
                 Log.i(TAG, e1.toString());
-                Util.showToast(this, true, e1.toString());
+                Util.showToast(this, true, "Loading default model");
+
+                storageReference.child(FirebaseStorageConstants.MODELS + "default" + "." + FirebaseStorageConstants.SFB)
+                        .getFile(modelFile).addOnSuccessListener(taskSnapshot -> {
+                    Log.i(TAG, "Firebase storage default model loaded successfully");
+                    currentProductModel = modelFile;
+
+                    updateAndCheckLoadVisibility(1);
+                }).addOnFailureListener(e2 -> {
+                    Log.i(TAG, e1.toString());
+                    Util.showToast(this, true, e2.toString());
+                });
             });
 
         } catch (IOException ex) {
@@ -358,7 +366,18 @@ public class MainActivity extends AppCompatActivity {
                 updateAndCheckLoadVisibility(2);
             }).addOnFailureListener(e1 -> {
                 Log.i(TAG, e1.toString());
-                Util.showToast(this, true, e1.toString());
+                Util.showToast(this, true, "Loading default image");
+
+                storageReference.child(FirebaseStorageConstants.IMAGES + "default" + "." + "png")
+                        .getFile(imageFile).addOnSuccessListener(taskSnapshot -> {
+                    Log.i(TAG, "Firebase storage image loaded successfully");
+                    currentProductImage = imageFile;
+
+                    updateAndCheckLoadVisibility(2);
+                }).addOnFailureListener(e2 -> {
+                    Log.i(TAG, e1.toString());
+                    Util.showToast(this, true, e2.toString());
+                });
             });
 
         } catch (IOException ex) {

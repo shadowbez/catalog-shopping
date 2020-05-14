@@ -3,22 +3,39 @@ package com.example.catalogshopping.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data class for shopping cart functionality.
+ */
 public class ShoppingCart {
 
+    /**
+     * Products stored in a list.
+     */
     private List<Product> products;
-    private double overallPrice;
 
     public ShoppingCart() {
         products = new ArrayList<>();
-        overallPrice = 0d;
     }
 
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    /**
+     * Add all elements from a different list.
+     * @param otherProducts the other list
+     */
     public void addAll(List<Product> otherProducts) {
         for (Product elem : otherProducts) {
             addItem(elem);
         }
     }
 
+    /**
+     * Add one unique item to the cart, if exists then do not add
+     * @param product the product to be added
+     * @return position of item
+     */
     public int addItem(Product product) {
         int existPlace = exists(product.getProductFirestore().getId());
         if (existPlace < 0) {
@@ -28,6 +45,11 @@ public class ShoppingCart {
         return existPlace;
     }
 
+    /**
+     * Safely remove an item from shopping cart. Will only remove if it is present.
+     * @param id the id of the item to be removed
+     * @return the position of remove product.
+     */
     public int removeItem(String id) {
         int removed = exists(id);
 
@@ -38,19 +60,12 @@ public class ShoppingCart {
         return removed;
     }
 
-    public double getOverallPrice() {
-        return overallPrice;
-    }
-
-    public void setOverallPrice(double overallPrice) {
-        this.overallPrice = overallPrice;
-    }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    private int exists(String id) {
+    /**
+     * Helper method which checks if the product already exists.
+     * @param id The id of the product to check
+     * @return the position of the product. If it does not exist it will be -1.
+     */
+    public int exists(String id) {
         int place = -1;
 
         for (int i = 0; i < products.size(); i++) {

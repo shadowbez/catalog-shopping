@@ -2,6 +2,16 @@
 
     <!-- GENERAL APP STRINGS -->
     <string name="app_name">Catalog Shopping AR PRE-ALPHA</string>
+    <string name="load">LOAD</string>
+    <string name="clear">CLEAR</string>
+    <string name="scan">SCAN</string>
+    <string name="name">NAME</string>
+    <string name="the_name_of_the_product">THE NAME OF THE PRODUCT</string>
+    <string name="price">PRICE</string>
+    <string name="description">DESCRIPTION</string>
+    <string name="desc_test">THIS IS A VERY GOOD PRODUCT</string>
+    <string name="close">CLOSE</string>
+    <string name="add_to_cart">ADD TO CART</string>
 
     <!-- LOGIN ACTIVITY -->
 

@@ -11,7 +11,7 @@
         android:id="@+id/button_main_load"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LOAD"
+        android:text="@string/load"
         app:layout_constraintBottom_toBottomOf="@+id/fragment__main_ar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.95"
@@ -23,7 +23,7 @@
         android:id="@+id/button_main_clear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="CLEAR"
+        android:text="@string/clear"
         app:layout_constraintBottom_toBottomOf="@+id/fragment__main_ar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.049"
@@ -35,7 +35,7 @@
         android:id="@+id/button_main_scan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SCAN/DW"
+        android:text="@string/scan"
         app:layout_constraintBottom_toBottomOf="@+id/fragment__main_ar"
         app:layout_constraintEnd_toEndOf="@+id/fragment__main_ar"
         app:layout_constraintHorizontal_bias="0.95"
@@ -58,7 +58,7 @@
     <LinearLayout
         android:id="@+id/linear_main_parent"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="90dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -67,52 +67,10 @@
         app:layout_constraintVertical_chainStyle="spread"
         app:layout_constraintVertical_weight="1" >
 
-<!--        <HorizontalScrollView-->
-<!--            android:id="@+id/scroll_main_items"-->
-<!--            android:layout_width="325dp"-->
-<!--            android:layout_height="match_parent">-->
-
-<!--            <LinearLayout-->
-<!--                android:id="@+id/linear_main_items"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:orientation="horizontal">-->
-
-<!--                <TextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:text="ITEM 1" />-->
-
-<!--            </LinearLayout>-->
-
-<!--        </HorizontalScrollView>-->
-
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_main_cart"
-            android:layout_width="325dp"
-            android:layout_height="match_parent" />
-
-        <LinearLayout
-            android:id="@+id/linear_main_other"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="PRICE" />
-
-            <Button
-                android:id="@+id/button3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="FIREBASE" />
-        </LinearLayout>
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 

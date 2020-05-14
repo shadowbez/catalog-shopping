@@ -8,11 +8,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
 
 import com.example.catalogshopping.model.Product;
-import com.example.catalogshopping.model.ProductFirestore;
 import com.example.catalogshopping.view.CustomArFragment;
 import com.example.catalogshopping.view.MainActivity;
 import com.google.ar.core.Anchor;
@@ -28,15 +25,18 @@ public class ModelLoader {
 
     private static final String TAG = "ModelLoader";
 
+    /**
+     * WeakReference of MainActivity in order to safely gather activity reference and use properties.
+     */
     private final WeakReference<MainActivity> owner;
 
     public ModelLoader(WeakReference<MainActivity> owner) {
         this.owner = owner;
     }
 
-    public void loadModel(Anchor anchor, String modelFilePath, Product product) {
+    public void loadModelAndInformation(Anchor anchor, String modelFilePath, Product product) {
         if (owner.get() == null) {
-            Log.d(TAG, "Activity is null.  Cannot load model.");
+            Log.d(TAG, "Model not loaded as activity is null");
             return;
         }
 //        RenderableSource renderableSource = RenderableSource.builder().setSource(
@@ -47,6 +47,7 @@ public class ModelLoader {
 //                .setRecenterMode(RenderableSource.RecenterMode.ROOT)
 //                .build();
 
+        // BUILD MODEL FIRST
         ModelRenderable.builder()
                 .setSource(owner.get(), Uri.parse(modelFilePath))
                 .build()
@@ -55,8 +56,9 @@ public class ModelLoader {
                     if (activity == null) {
                         return null;
                     } else if (throwable != null) {
-                        onException(throwable, activity);
+                        showException(throwable, activity);
                     } else {
+                        // STORE REFERENCE TO LOADED MODELS SO THAT THEY ARE CLEARED AFTERWARDS
                         owner.get().getLoadedNodes().add(addNodeToScene(anchor, renderable, activity.getCustomArFragment(), activity, product));
                     }
                     return null;
@@ -64,6 +66,7 @@ public class ModelLoader {
     }
 
     private AnchorNode addNodeToScene(Anchor anchor, ModelRenderable renderable, CustomArFragment fragment, MainActivity mainActivity, Product product) {
+        // PREPARE INFO NODE
         AnchorNode anchorNode = new AnchorNode(anchor);
         TransformableNode node = new TransformableNode(fragment.getTransformationSystem());
         node.setRenderable(renderable);
@@ -71,32 +74,39 @@ public class ModelLoader {
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
 
-
+        // BUILD INFO RENDERABLE
         ViewRenderable.builder()
                 .setView(mainActivity, R.layout.product_info_item)
                 .build()
                 .thenAccept(viewRenderable -> {
+                    // LOAD INFO NODE
                     TransformableNode infoNode = new TransformableNode(fragment.getTransformationSystem());
                     infoNode.setRenderable(viewRenderable);
                     infoNode.setParent(anchorNode);
                     infoNode.setLocalPosition(new Vector3(0f, node.getLocalPosition().y + 0.5f, 0f));
 
-                    infoNode.select();
-
+                    // Fetch all UI elements from layout. The "old fashioned" way is used because of a glitch within Sceneform
                     LinearLayout mainLinear = (LinearLayout) viewRenderable.getView();
 
                     LinearLayout firstLinear = (LinearLayout) mainLinear.getChildAt(0);
                     LinearLayout secondLinear = (LinearLayout) mainLinear.getChildAt(1);
 
-                    ConstraintLayout firstCon = (ConstraintLayout) firstLinear.getChildAt(0);
-                    ConstraintLayout secondCon = (ConstraintLayout) secondLinear.getChildAt(0);
+                    LinearLayout firstOneLin = (LinearLayout) firstLinear.getChildAt(0);
+                    LinearLayout firstTwoLin = (LinearLayout) firstLinear.getChildAt(1);
 
-                    TextView price = (TextView) firstCon.getViewById(R.id.text_info_productPrice);
-                    TextView name = (TextView) firstCon.getViewById(R.id.text_info_productName);
-                    TextView description = (TextView) secondCon.getViewById(R.id.text_info_productDescription);
-                    Button close = (Button) firstCon.getViewById(R.id.button_info_close);
-                    Button addToCart = (Button) secondCon.getViewById(R.id.button_info_addCart);
+                    LinearLayout secondOneLin = (LinearLayout) secondLinear.getChildAt(0);
+                    LinearLayout secondTwoLin = (LinearLayout) secondLinear.getChildAt(1);
 
+
+                    TextView name = (TextView) firstOneLin.getChildAt(1);
+                    TextView price = (TextView) firstTwoLin.getChildAt(1);
+
+                    TextView description = (TextView) secondOneLin.getChildAt(1);
+
+                    Button close = (Button) secondTwoLin.getChildAt(0);
+                    Button addToCart = (Button) secondTwoLin.getChildAt(1);
+
+                    // Setup UI elements
                     price.setText(String.valueOf(product.getProductFirestore().getPrice()));
                     name.setText(product.getProductFirestore().getName());
                     description.setText(product.getProductFirestore().getDescription());
@@ -105,7 +115,6 @@ public class ModelLoader {
                         removeAnchorNode(anchorNode);
                     });
 
-                    // TODO FIX
                     addToCart.setOnClickListener(e -> {
                         int existed = mainActivity.getShoppingCart().addItem(product);
                         if (existed < 0) {
@@ -119,16 +128,25 @@ public class ModelLoader {
         return anchorNode;
     }
 
-    private void onException(Throwable throwable, Context context){
+    /**
+     * Show exception if node cannot be processed/loaded properly
+     * @param throwable
+     * @param context
+     */
+    private void showException(Throwable throwable, Context context){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         builder.setMessage(throwable.getMessage())
-                .setTitle("ARCore error!");
+                .setTitle("ARCore error");
         AlertDialog dialog = builder.create();
 
         dialog.show();
     }
 
+    /**
+     * Remove node from scene safely.
+     * @param anchorNode the reference to the node to be removed.
+     */
     public void removeAnchorNode(AnchorNode anchorNode) {
         MainActivity activity = owner.get();
         if (activity != null && anchorNode != null) {

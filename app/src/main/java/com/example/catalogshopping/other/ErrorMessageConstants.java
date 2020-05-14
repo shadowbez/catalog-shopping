@@ -1,5 +1,8 @@
 package com.example.catalogshopping.other;
 
+/**
+ * Constant helper class which stores error messages of cloud components.
+ */
 public class ErrorMessageConstants {
 
     public static final String FIRESTORE_CONN_ERR = "FATAL ERROR CONNECTING TO FIRESTORE";
